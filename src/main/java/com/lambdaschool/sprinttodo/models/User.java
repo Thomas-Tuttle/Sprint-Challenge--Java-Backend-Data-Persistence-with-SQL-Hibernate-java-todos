@@ -1,7 +1,6 @@
 package com.lambdaschool.sprinttodo.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -9,10 +8,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-// User is considered the parent entity
-
 @Entity
-@Table(name="users")
+@Table(name = "users")
 public class User extends Auditable
 {
     @Id
@@ -24,48 +21,64 @@ public class User extends Auditable
     private String username;
 
     @Column(nullable = false)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @OneToMany(mappedBy = "user",
-               cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     @JsonIgnoreProperties("user")
     private List<UserRoles> userRoles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user",
-               cascade = CascadeType.ALL,
-               orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     @JsonIgnoreProperties("user")
-    private  List<Todo> todos = new ArrayList<>();
+    private List<UserTodos> todos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties("user")
+    private List<Todo> todoslist = new ArrayList<>();
+
     public User()
     {
     }
 
-    public List<Todo> getToDos()
+    public User(String username, String password, List<UserRoles> userRoles, List<UserTodos> todos)
     {
-        return todos;
-    }
-
-    public void setToDos(List<Todo> todos)
-    {
+        this.username = username;
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        this.password = passwordEncoder.encode(password);
+        this.userRoles = userRoles;
         this.todos = todos;
     }
 
     public User(String username, String password, List<UserRoles> userRoles)
     {
-        setUsername(username);
-        setPassword(password);
-
-        for (UserRoles ur : userRoles)
-        {
-            ur.setUser(this);
-        }
+        this.username = username;
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        this.password = passwordEncoder.encode(password);
         this.userRoles = userRoles;
+    }
+
+    public List<Todo> getTodoslist()
+    {
+        return todoslist;
+    }
+
+    public void setTodoslist(List<Todo> todoslist)
+    {
+        this.todoslist = todoslist;
     }
 
     public long getUserid()
     {
         return userid;
+    }
+
+    public List<UserTodos> getTodos()
+    {
+        return todos;
+    }
+
+    public void setTodos(List<UserTodos> todos)
+    {
+        this.todos = todos;
     }
 
     public void setUserid(long userid)
@@ -94,11 +107,6 @@ public class User extends Auditable
         this.password = passwordEncoder.encode(password);
     }
 
-    public void setPasswordNoEncrypt(String password)
-    {
-        this.password = password;
-    }
-
     public List<UserRoles> getUserRoles()
     {
         return userRoles;
@@ -113,7 +121,7 @@ public class User extends Auditable
     {
         List<SimpleGrantedAuthority> rtnList = new ArrayList<>();
 
-        for (UserRoles r: this.userRoles)
+        for (UserRoles r : this.userRoles)
         {
             String myRole = "ROLE_" + r.getRole().getName().toUpperCase();
             rtnList.add(new SimpleGrantedAuthority(myRole));

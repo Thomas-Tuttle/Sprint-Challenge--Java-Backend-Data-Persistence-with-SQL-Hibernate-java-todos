@@ -1,4 +1,4 @@
-package com.lambdaschool.sprinttodo.repository;
+package com.lambdaschool.sprinttodo.repos;
 
 import com.lambdaschool.sprinttodo.models.Role;
 import org.springframework.data.jpa.repository.Modifying;

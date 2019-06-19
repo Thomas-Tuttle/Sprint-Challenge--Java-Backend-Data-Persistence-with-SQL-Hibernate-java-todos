@@ -7,31 +7,30 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "userroles")
-public class UserRoles extends Auditable implements Serializable
+@Table(name = "usertodos")
+public class UserTodos extends Auditable implements Serializable
 {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"userRoles", "hibernateLazyInitializer"})
+    @JsonIgnoreProperties({"todos", "hibernateLazyInitializer"})
     @JoinColumn(name = "userid")
     private User user;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"userRoles", "hibernateLazyInitializer"})
-    @JoinColumn(name = "roleid")
-    private Role role;
+    @JsonIgnoreProperties({"userTodos", "hibernateLazyInitializer"})
+    @JoinColumn(name = "todoid")
+    private Todo todo;
 
-    public UserRoles()
+    public UserTodos()
     {
     }
 
-    public UserRoles(User user, Role role)
+    public UserTodos(User user, Todo todo)
     {
         this.user = user;
-        this.role = role;
+        this.todo = todo;
     }
-
 
     public User getUser()
     {
@@ -43,14 +42,14 @@ public class UserRoles extends Auditable implements Serializable
         this.user = user;
     }
 
-    public Role getRole()
+    public Todo getTodo()
     {
-        return role;
+        return todo;
     }
 
-    public void setRole(Role role)
+    public void setTodo(Todo todo)
     {
-        this.role = role;
+        this.todo = todo;
     }
 
     @Override
@@ -60,18 +59,18 @@ public class UserRoles extends Auditable implements Serializable
         {
             return true;
         }
-        if (!(o instanceof UserRoles))
+        if (!(o instanceof UserTodos))
         {
             return false;
         }
-        UserRoles userRoles = (UserRoles) o;
-        return user.equals(userRoles.user) &&
-                role.equals(userRoles.role);
+        UserTodos userTodos = (UserTodos) o;
+        return getUser().equals(userTodos.getUser()) &&
+                getTodo().equals(userTodos.getTodo());
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(user, role);
+        return Objects.hash(getUser(), getTodo());
     }
 }

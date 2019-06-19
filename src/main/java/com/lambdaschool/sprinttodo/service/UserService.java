@@ -1,11 +1,11 @@
-package com.lambdaschool.sprinttodo.services;
+package com.lambdaschool.sprinttodo.service;
 
+import com.lambdaschool.sprinttodo.models.Todo;
 import com.lambdaschool.sprinttodo.models.User;
 
 import java.util.List;
 
-public interface UserService
-{
+public interface UserService {
 
     List<User> findAll();
 
@@ -16,4 +16,6 @@ public interface UserService
     User save(User user);
 
     User update(User user, long id);
+
+    Todo addTodo(Todo todo, long id);
 }

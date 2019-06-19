@@ -1,9 +1,11 @@
-package com.lambdaschool.sprinttodo.services;
+package com.lambdaschool.sprinttodo.service;
 
+import com.lambdaschool.sprinttodo.models.Todo;
 import com.lambdaschool.sprinttodo.models.User;
 import com.lambdaschool.sprinttodo.models.UserRoles;
-import com.lambdaschool.sprinttodo.repository.RoleRepository;
-import com.lambdaschool.sprinttodo.repository.UserRepository;
+import com.lambdaschool.sprinttodo.repos.RoleRepository;
+import com.lambdaschool.sprinttodo.repos.TodoRepository;
+import com.lambdaschool.sprinttodo.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +19,6 @@ import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Service(value = "userService")
 public class UserServiceImpl implements UserDetailsService, UserService
 {
@@ -27,6 +28,9 @@ public class UserServiceImpl implements UserDetailsService, UserService
 
     @Autowired
     private RoleRepository rolerepos;
+
+    @Autowired
+    private TodoRepository todoRepos;
 
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
@@ -71,7 +75,6 @@ public class UserServiceImpl implements UserDetailsService, UserService
     {
         User newUser = new User();
         newUser.setUsername(user.getUsername());
-        newUser.setPasswordNoEncrypt(user.getPassword());
 
         ArrayList<UserRoles> newRoles = new ArrayList<>();
         for (UserRoles ur : user.getUserRoles())
@@ -79,6 +82,13 @@ public class UserServiceImpl implements UserDetailsService, UserService
             newRoles.add(new UserRoles(newUser, ur.getRole()));
         }
         newUser.setUserRoles(newRoles);
+
+        ArrayList<Todo> newTodos = new ArrayList<>();
+        for (Todo t : user.getTodoslist())
+        {
+            newTodos.add(new Todo(t.getDescription(), newUser));
+        }
+        newUser.setTodoslist(newTodos);
 
         return userrepos.save(newUser);
     }
@@ -101,17 +111,15 @@ public class UserServiceImpl implements UserDetailsService, UserService
 
                 if (user.getPassword() != null)
                 {
-                    currentUser.setPasswordNoEncrypt(user.getPassword());
+                    currentUser.setPassword(user.getPassword());
                 }
 
                 if (user.getUserRoles().size() > 0)
                 {
-                    // with so many relationships happening, I decided to go
-                    // with old school queries
-                    // delete the old ones
+
                     rolerepos.deleteUserRolesByUserId(currentUser.getUserid());
 
-                    // add the new ones
+
                     for (UserRoles ur : user.getUserRoles())
                     {
                         rolerepos.insertUserRoles(id, ur.getRole().getRoleid());
@@ -131,4 +139,24 @@ public class UserServiceImpl implements UserDetailsService, UserService
         }
 
     }
+
+    @Transactional
+    @Override
+    public Todo addTodo(Todo todo, long id)
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userrepos.findByUsername(authentication.getName());
+        Todo newTodo = new Todo();
+        newTodo.setDescription(todo.getDescription());
+
+        ArrayList<Todo> newTodos = new ArrayList<>();
+        for (Todo t : currentUser.getTodoslist())
+        {
+            todoRepos.insertUserTodos(t.getTodoid(), currentUser.getUserid());
+        }
+        currentUser.setTodoslist(newTodos);
+
+        return todoRepos.save(newTodo);
+    }
+
 }

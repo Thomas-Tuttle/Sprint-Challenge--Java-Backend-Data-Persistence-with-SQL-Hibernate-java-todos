@@ -4,9 +4,9 @@ import com.lambdaschool.sprinttodo.models.Role;
 import com.lambdaschool.sprinttodo.models.Todo;
 import com.lambdaschool.sprinttodo.models.User;
 import com.lambdaschool.sprinttodo.models.UserRoles;
-import com.lambdaschool.sprinttodo.repository.RoleRepository;
-import com.lambdaschool.sprinttodo.repository.ToDoRepository;
-import com.lambdaschool.sprinttodo.repository.UserRepository;
+import com.lambdaschool.sprinttodo.repos.RoleRepository;
+import com.lambdaschool.sprinttodo.repos.TodoRepository;
+import com.lambdaschool.sprinttodo.repos.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,9 +19,9 @@ public class SeedData implements CommandLineRunner
 {
     RoleRepository rolerepos;
     UserRepository userrepos;
-    ToDoRepository todorepos;
+    TodoRepository todorepos;
 
-    public SeedData(RoleRepository rolerepos, UserRepository userrepos, ToDoRepository todorepos)
+    public SeedData(RoleRepository rolerepos, UserRepository userrepos, TodoRepository todorepos)
     {
         this.rolerepos = rolerepos;
         this.userrepos = userrepos;
@@ -33,39 +33,29 @@ public class SeedData implements CommandLineRunner
     {
         Role r1 = new Role("admin");
         Role r2 = new Role("user");
-        Role r3 = new Role ("usertwo");
-        Role r4 = new Role ("userthree");
 
         ArrayList<UserRoles> admins = new ArrayList<>();
         admins.add(new UserRoles(new User(), r1));
-//        admins.add(new UserRoles(new User(), r2));
+        admins.add(new UserRoles(new User(), r2));
 
         ArrayList<UserRoles> users = new ArrayList<>();
         users.add(new UserRoles(new User(), r2));
 
-        ArrayList<UserRoles> userstwo = new ArrayList<>();
-        users.add(new UserRoles(new User(), r3));
-
-        ArrayList<UserRoles> usersthree = new ArrayList<>();
-        users.add(new UserRoles(new User(), r4));
-
         rolerepos.save(r1);
         rolerepos.save(r2);
-        rolerepos.save(r3);
-        rolerepos.save(r4);
 
-        User u1 = new User("barnbarn", "ILuvM4th!", users);
+        User u1 = new User("Thomas", "password", admins);
         User u2 = new User("admin", "password", admins);
-        User u3 = new User("Bob", "password", userstwo);
-        User u4 = new User("Jane", "password", usersthree);
+        User u3 = new User("Bob", "password", users);
+        User u4 = new User("Jane", "password", users);
 
         // the date and time string should get coverted to a datetime Java data type. This is done in the constructor!
-        u4.getToDos().add(new Todo("Finish java-orders-swagger", "2019-01-13 04:04:04", u4));
-        u4.getToDos().add(new Todo("Feed the turtles", "2019-03-01 04:04:04", u4));
-        u4.getToDos().add(new Todo("Complete the sprint challenge", "2019-02-22 04:04:04", u4));
+        u4.getTodoslist().add(new Todo("Finish java-orders-swagger", u4));
+        u4.getTodoslist().add(new Todo("Feed the turtles", u4));
+        u4.getTodoslist().add(new Todo("Complete the sprint challenge", u4));
 
-        u3.getToDos().add(new Todo("Walk the dogs", "2019-01-17 04:04:04", u3));
-        u3.getToDos().add(new Todo("provide feedback to my instructor", "2019-02-13 04:04:04", u3));
+        u3.getTodoslist().add(new Todo("Walk the dogs", u3));
+        u3.getTodoslist().add(new Todo("provide feedback to my instructor", u3));
 
         userrepos.save(u1);
         userrepos.save(u2);

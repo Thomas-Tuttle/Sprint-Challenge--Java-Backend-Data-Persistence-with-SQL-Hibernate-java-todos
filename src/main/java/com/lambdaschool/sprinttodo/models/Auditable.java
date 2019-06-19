@@ -21,13 +21,13 @@ abstract class Auditable
     protected String createdBy;
 
     @CreatedDate
-            @Temporal(TIMESTAMP)
+    @Temporal(TIMESTAMP)
     protected Date createdDate;
 
     @LastModifiedBy
     protected String lastModifiedBy;
 
     @LastModifiedDate
-            @Temporal(TIMESTAMP)
+    @Temporal(TIMESTAMP)
     protected Date lastModifiedDate;
 }
